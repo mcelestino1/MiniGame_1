@@ -7,11 +7,12 @@ public class Exit {
         this.destRoomId = destRoomId;
     }
 
+
+
     @Override
     public String toString() {
-        return "Exit{" +
+        return "Exit " +
                 "direction='" + direction + '\'' +
-                ", destRoomId=" + destRoomId +
-                '}';
+                ", destRoomId=" + destRoomId;
     }
 }
