@@ -1,0 +1,16 @@
+
+1. create a Player class. In the Player class, you will create attributes for
+the Player type objects. For example, you can create playerLocation. You may
+want to create movePlayer() methods to make the player move.
+In the while loop, you can create a method to navigate the room but you can
+create the loop in the Main class. Go to line 145 of Main class.
+Then, you can complete the while loop by including information about the current
+ room and sentinel value to decide whether you will allow the user input
+ continue or not.
+ Then, inside of the while loop, you may want to add nested while loop. Then,
+ you will add the case whether it has direction n,e,w,s and provide each case,
+ how you will move the player. Do this part first, then let me know.
+
+2. I added Player class. 
+
+
