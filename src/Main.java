@@ -1,10 +1,27 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**Class: Main
+ * @author Muketoi Celestino
+ * @version 1.0
+ * Course: ITEC 3860 Spring 2023
+ * Written: February 10, 2023
+ *
+ * This class – It writes Rooms into a text file "Rooms.txt" then reads them and prints the out to the console.
+ *              And then prompts the User to start the game.
+ *
+ *              allows a user to play a Text based game, the player enters their name when starting. The player has to navigate
+ *              through the game by entering either just the first letter or the full word of a direction. If the exit direction
+ *              is not available for that room. The player is informed and requested to enter another direction.
+ *              The player has limit of 7 rooms to visit or total moves before GAME OVER.
+ *              To win, The player has to reach a Specific Room (The Attic)
+ *
+ *
+*/
 public class Main {
     public static void main(String[] args) throws FileNotFoundException {
 
@@ -17,7 +34,7 @@ public class Main {
             outputFile.println("This is the Beginning of the Demo Game... You are in a Room with two doors." +
                     " One on the North with a bird on it, Another on the West with a Dog on it." +
                     " You look around and see a ladder leading to a room upwards which can be pulled down");
-            outputFile.println("You can either go North, West, or Up the ladder.");
+            outputFile.println("You can either go NORTH, WEST, or UP the ladder.");
             outputFile.println("NORTH 3");
             outputFile.println("WEST 2");
             outputFile.println("UP 6");
@@ -45,7 +62,7 @@ public class Main {
             // Room 4
             outputFile.println("4");
             outputFile.println("Conservatory");
-            outputFile.println("This is Conservatory... The view is beautiful, you sit in awe for a couple of minutes and Relax. " +
+            outputFile.println("This is the Conservatory... The view is beautiful, you sit in awe for a couple of minutes and Relax. " +
                     "There are three exits in this room. A ladder going down, A door with a cat Painting which leads to the East " +
                     ", and A door with a Fish Painting on it leading to the South");
             outputFile.println("You can either go SOUTH, EAST, or DOWN the ladder.");
@@ -60,7 +77,7 @@ public class Main {
             outputFile.println("You just entered a cramped up room. It must be the ATTIC... " +
                             "You crawl into the room and you see the room is actually bigger than it seemed..." +
                             "CONGRATULATIONS!!!! You reached the last room of the Game you get a Reward of 'CHIEF EXPLORER'"
-//                    "There is only one door (with a Dog painting on it.)"
+
             );
             outputFile.println("You can only go WEST.");
             outputFile.println("WEST 4");
@@ -71,19 +88,20 @@ public class Main {
             outputFile.println("Storage Room");
             outputFile.println("You are currently in the Storage room... You see a bunch of miscellaneous tools and items." +
                     " There is one door (With a bird on it) going North and a ladder going down");
-            outputFile.println("You can either go North, or Down the ladder.");
+            outputFile.println("You can either go NORTH, or DOWN the ladder.");
             outputFile.println("NORTH 4");
             outputFile.println("DOWN 1");
             outputFile.println(breaker);
 
-        } catch (Exception ex) {
-            System.out.println("Exception caught");
+        } catch (IOException ex) {
+            System.out.println("IOException caught");
             ex.printStackTrace();
         }
 
+        // Reading file "Rooms.txt" and creating room objects being added to an ArrayList of Rooms "rooms"
         ArrayList<Room> rooms = new ArrayList<>();
-
         Scanner scan = new Scanner(file);
+
         while (scan.hasNextLine()) {
             String id = scan.nextLine();
             int roomID = Integer.parseInt(id);
@@ -91,20 +109,10 @@ public class Main {
             String description = scan.nextLine();
             String directions = scan.nextLine();
 
-            //create an Exit type ArrayList to point to multiple Exits.
-
-
-            //Then each exit object will have two attributes which is direction and destination.
-
-            //The loop will iterate to retrieve each Exit object data until it reaches out to the next room number.
-            //In this case, each room data must only two attributes. So once it reaches up to two data, then it will identify
-            //as the next room.
-            //do not use hashmap.  but think about what type of data structure you can use. List or Arrays or something else.
+            // Creating an arrayList of exits to be added to the Room object
             ArrayList<Exit> exits = new ArrayList<>();
             while (scan.hasNextLine()) {
-
                 Exit exit;
-//                    System.out.println("Nope, that's not it!");
 
                 String direction = scan.next();
                 if (direction.equals(breaker)) {
@@ -115,43 +123,80 @@ public class Main {
                     scan.nextLine();
                     break;
                 }
+
                 int destRoomId = Integer.parseInt(scan.next());
                 exit = new Exit(direction, destRoomId);
                 exits.add(exit);
             }
         }
+
+        // Printing out the rooms of the game
         for (Room r : rooms) {
             System.out.println(r);
         }
 
         // START THE GAME
-        System.out.println();
-        System.out.println("Welcome to THE EXPLORER GAME....");
-        int dRoomID;
-        int roomID=1;
-        // create a room object that gets the room using the room ID to call the getExits method...
-        Room r = rooms.get((roomID-1));
-        System.out.println(r);
-
-        boolean cont = true;
         Scanner input = new Scanner(System.in);
+        System.out.print("\nPlease Enter your name: ");
+        Player player = new Player(input.nextLine(), 0, 1);
 
-        // call the exits of the room into an object ex
-        ArrayList<Exit> ex = new ArrayList<>();
-//        ex = r
+        System.out.println("\nHello " + player.getName() + "!");
+        System.out.println("Welcome to THE EXPLORER GAME....");
+        System.out.println("To navigate through this game, You have to enter the first letter or full direction.");
+        System.out.println("The goal is to reach the Final Room. However, you have a limit of 7 rooms to visit.");
+        System.out.println("And you have to try to find the Final room before your moves run out. \nGood Luck!!!!");
+
         // get room by using roomId
+        final int LIMIT = 7;
+        int n = player.getNumberOfRoomsVisited();
 
+        // loops while player has not depleted their number of moves
+        while (n <= LIMIT) {
 
-        while (cont) {
-
-            System.out.print("Which direction would you like to go in?");
+            Room r = rooms.get((player.getLocationID() - 1));
+            if (r.isVisited()){
+                System.out.println("\nThis "+ r.getRoomName() + " has already been visited");
+            } else {
+                System.out.println("\nThis " + r.getRoomName() + " has not been visited yet");
+            }
+            r.setVisited(true);
+            System.out.println(r.getDescription());
+            if (player.getLocationID() == 5) {
+                System.out.println("********** WELL DONE **********");
+                break;
+            }
+            System.out.println(r.getDirections());
+            System.out.print("Which direction would you like to go in? ");
             String dir = input.nextLine();
 
+            int count = 0;      // counter to tally as the program checks if input is an exit in the arrayList
 
-            // for each exit in the current room, if the direction entered(dir) is equal to the direction in exit arrayList =
+            // Loop through ArrayList of exits of the player's current location
+            for (Exit e : r.getExits()) {
+                count++;
+
+                // Checks if input dir == exit e in ArrayList or just the first letter
+                if (dir.equalsIgnoreCase(e.getDirection()) || dir.equalsIgnoreCase((e.getDirection().substring(0, 1)))) {
+                    n++;
+                    player.setNumberOfRoomsVisited(n);      // tally for number of rooms visited
+
+                    // Move player into new room
+                    player.setLocationID(e.getDestRoomId());
+                    break;
+                }
+
+                // if direction input is not a valid exit in ArrayList of Exits of the room
+                if (count == r.getExits().size()) {
+                    System.out.println("Invalid Exit");
+                    System.out.println("Please Enter a valid exit");
+                }
+            }
+        }
+
+        if (n == 8) {
+            System.out.println("GAME OVER !!! \nYou ran out of Time and didn't reached the final room");
         }
     }
 
-    // Using room ID, get the Array List of exists in that room   r = rooms.get(roomID-1)
 }
 
